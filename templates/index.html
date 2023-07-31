@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'style/grid.css'%}">
+    <title>Document</title>
+</head>
+<body>
+{% include 'header.html' %}
+<h3>board</h3>
+<section>
+<div class="container">
+{% for board in data %}
+        <div class="content">
+            <div class="content-img">
+                <img src="media/{{board.board_file}}">
+            </div>
+            <div class="content-info">
+                <h4>title : {{board.board_title}}</h4>
+                <p>content : {{board.board_content}}<p>
+                <span>writer : {{board.board_writer}}</span>
+                <span>{{board.board_modified}}</span>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% include 'footer.html' %}
+</section>
+</body>
+</html>
