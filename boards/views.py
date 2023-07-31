@@ -10,6 +10,9 @@ from pyuploadcare import Uploadcare, File
 from .models import Board
 from .serializers import BoardSerializer
 
+from PIL import Image
+from pytesseract import *
+
 def say_hello(request) :
     return render(request, "index.html", {
         "data" : Board.objects.all()
@@ -35,16 +38,14 @@ class Boards(APIView) :
 
         if serializer.is_valid() :
             board = serializer.save() # create() 메소드를 호출하게 됨 
-
             if board.loaded_file and board.loaded_file.size < settings.FILE_SIZE_LIMIT :
                 uploadcare = Uploadcare(public_key=settings.UC_PUBLIC_KEY, secret_key=settings.UC_SECRET_KEY)
                 with open(board.loaded_file.path, 'rb') as file_object:
                     ucare_file = uploadcare.upload(file_object)
                     image_url = f"https://ucarecdn.com/{ucare_file.uuid}/"
-                    board.image_url = image_url
-
-            board.author = request.user
-            board.save()
+                    board.image_link = image_url
+                board.author = request.user
+                board.save()
             return redirect(f'/board/{board.pk}')
 
         return Response(serializer.errors)
@@ -89,3 +90,20 @@ class BoardDetail(APIView) :
 
         board.delete()
         return Response({})
+    
+class GetText(APIView):
+    def get(self, request, pk, lang):
+        board = Board.objects.get(pk=pk)
+        if board.loaded_file != "":
+            filename = board.loaded_file
+            image = Image.open(filename)
+            text = image_to_string(image, lang)
+            return Response({"text":text})  
+        else:
+            return Response({})
+        
+# class printText(APIView):
+#  if board.loaded_file != "":
+#                 filename = board.loaded_file
+#                 image = Image.open(filename)
+#                 text = image_to_string(image, lang='kor+eng')

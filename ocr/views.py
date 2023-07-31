@@ -41,4 +41,4 @@ def board_write(request) :
     return render(request, 'board_form.html')
 
 def boards(request) :
-    return render(request, 'index.html')
+    return render(request, 'board_list.html')
